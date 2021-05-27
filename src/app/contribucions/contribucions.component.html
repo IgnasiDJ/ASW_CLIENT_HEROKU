@@ -1,0 +1,185 @@
+<div class="Menu">
+  <button (click)="getRecientes()">Recientes</button>&nbsp;&nbsp;
+  <button (click)="getAsk()">Ask</button>&nbsp;&nbsp;
+  <button (click)="getIndex()">Index</button>&nbsp;&nbsp;
+  <button (click)="getMyThreads()">My Threads</button>&nbsp;&nbsp;
+  <button (click)="showContribution()">New Contribution</button>&nbsp;&nbsp;
+  <button (click)="getUser(1)"> MY USER</button>&nbsp;&nbsp;
+
+</div>
+<div *ngIf="origin=='newcontribution'">
+  <ng-container *ngTemplateOutlet="DisplayFormContribution;"></ng-container>
+</div>
+<div *ngIf="SelectedUser && origin=='user'">
+  <ng-container *ngTemplateOutlet="DisplayUserinfo; context:{ item: SelectedUser }"></ng-container>
+</div>
+<h2>{{this.TITLEPAGE}}</h2>
+<ul >
+  <span *ngIf="origin=='mythreads'">Les meves contribucions</span>
+  <li *ngFor="let contribucion of LISTACONTRIBUCIONS">
+    <div *ngIf="isURL(contribucion.url)">
+      <ng-container *ngTemplateOutlet="DisplayContribucionURL; context:{ item: contribucion }"></ng-container>
+    </div>
+    <div *ngIf="!isURL(contribucion.url)">
+      <ng-container *ngTemplateOutlet="DisplayContribucionAsk; context:{ item: contribucion }"></ng-container>
+    </div>
+<br><br>
+  </li>
+
+</ul>
+
+<span *ngIf="origin=='mythreads'">Els meus comentaris
+  <ul>
+      <li *ngFor="let comentari of LISTACOMENTARIS">
+        <ng-container *ngTemplateOutlet="DisplayCommentMyThreads; context:{ item: comentari }"></ng-container>
+      </li>
+  </ul>
+
+</span>
+
+
+<div *ngIf="SelectedContribution">
+  <div>
+    <span>{{SelectedContribution.id}} </span>
+    {{SelectedContribution.likes}} {{SelectedContribution.titol}}
+  </div>
+  <div>
+    <button (click)="likeContribution(SelectedContribution.id)">⇧</button>
+    <button (click)="dislikeContribution(SelectedContribution.id)">⇩</button>
+    <button (click)="show(SelectedContribution.id)">UPDATE</button>
+    <button (click)="displayForm(-1)">Make Comment</button>
+    <br>
+    <div class="hidden" id="-1">
+      <input id="input-1">
+      <button (click)="postComment(-1)">POST it</button>
+    </div>
+  </div>
+  <div>{{SelectedContribution.author}} <button (click)="getUser(SelectedContribution.user_id)">👤</button> {{SelectedContribution.data}}</div>
+  <a *ngIf="isURL(SelectedContribution.url)" href="{{SelectedContribution.url}}">GO TO LINK</a>
+  <span *ngIf="!isURL(SelectedContribution.url)">{{SelectedContribution.content}}</span>
+  <br>
+
+
+    Comentaris d'aquesta contribució:
+    <br>
+    <ul>
+      <li *ngFor="let comentari of SelectedContribution.comments">
+        <ng-container *ngTemplateOutlet="DisplayComment; context:{ item: comentari }"></ng-container>
+        <ng-container *ngTemplateOutlet="recursiveListTmpl; context:{ list: comentari.comments_fills }"></ng-container>
+      </li>
+    </ul>
+
+</div>
+
+
+<ng-template #recursiveListTmpl let-list="list">
+  <li *ngFor="let item of list" class="subcomment">
+    <ng-container *ngTemplateOutlet="DisplayComment; context:{ item: item }"></ng-container>
+    <ul *ngIf="item.comments_fills.length > 0">
+      <ng-container
+        *ngTemplateOutlet="recursiveListTmpl; context:{ list: item.comments_fills }"
+      ></ng-container>
+    </ul>
+  </li>
+</ng-template>
+
+
+<ng-template #DisplayComment let-item="item">
+   {{ item.likes }}&nbsp;&nbsp;{{ item.author }}
+   <button (click)="likeComentari(item.id)">⇧</button>
+   <button (click)="dislikeComentari(item.id)">⇩</button>
+   <button (click)="getUser(item.user_id)">👤</button>
+   &nbsp;&nbsp;{{ item.data }}<br>
+   {{ item.content }}<br>
+   <button (click)="displayForm(item.id)">Make Comment</button>
+   <div class="hidden" id="{{item.id}}">
+     <input id="input{{item.id}}">
+     <button (click)="postComment(item.id)">POST it</button>
+   </div>
+
+</ng-template>
+
+<ng-template #DisplayContribucionURL let-item="item">
+   {{ item.likes }}&nbsp;&nbsp;{{ item.author }}<button (click)="getUser(item.user_id)">👤</button>
+   <button (click)="likeContribution(item.id)">⇧</button>
+   <button (click)="dislikeContribution(item.id)">⇩</button>
+   &nbsp;&nbsp;{{ item.data }}<br>
+   <a href="{{item.url}}" class="titol"> {{ item.titol }} </a><br>
+   <button (click)="show(item.id)">Show more</button>
+
+</ng-template>
+
+
+<ng-template #DisplayContribucionAsk let-item="item">
+   {{ item.likes }}&nbsp;&nbsp;{{ item.author }}
+   <button (click)="getUser(item.user_id)">👤</button>
+   <button (click)="likeContribution(item.id)">⇧</button>
+   <button (click)="dislikeContribution(item.id)">⇩</button>
+   &nbsp;&nbsp;{{ item.data }}<br>
+   <span class="titol">{{ item.titol }}</span><br>
+   <button (click)="show(item.id)">Show more</button>
+</ng-template>
+
+
+<ng-template #DisplayCommentMyThreads let-item="item">
+   {{ item.likes }}&nbsp;&nbsp;{{ item.author }}
+   <button (click)="getUser(item.user_id)">👤</button>
+   <button (click)="likeComentari(item.id)">⇧</button>
+   <button (click)="likeComentari(item.id)">⇩</button>
+   &nbsp;&nbsp;{{ item.data }}<br>
+   <span class="content">{{ item.content }}</span><br>
+   <button (click)="show(item.id_contribution)">Show full contribution {{item.id_contribution}}</button>
+</ng-template>
+
+<ng-template #DisplayFormContribution>
+   <input id="FormTitol" placeholder="titol"><br>
+   <input id="FormURL" placeholder="url"><br>
+   <input id="FormContent" placeholder="content"><br>
+   <button (click)="postContribution()">Make a new Contribution</button>
+</ng-template>
+
+
+<ng-template #DisplayUserinfo let-item="item">
+  <h2>User Info:</h2>
+   ID: {{ item.user_info.id }}<br>
+   created_at: {{ item.user_info.created_at }}<br>
+   apikey: {{ item.user_info.api_key }}<br>
+   name: {{ item.user_info.name }}<br>
+   description: {{ item.user_info.description }}<br>
+   <button *ngIf="item.user_info.id == 1" (click)="displayForm(-2)">Make Comment</button>
+   <div class="hidden" id="-2">
+     <input id="DescriptionInput">
+     <button (click)="newDescription()">POST it</button>
+   </div>
+
+   <h2>Contribucions d'aquest usuari:</h2>
+   <li *ngFor="let contribucion of item.contributions">
+     <div *ngIf="isURL(contribucion.url)">
+       <ng-container *ngTemplateOutlet="DisplayContribucionURL; context:{ item: contribucion }"></ng-container>
+     </div>
+     <div *ngIf="!isURL(contribucion.url)">
+       <ng-container *ngTemplateOutlet="DisplayContribucionAsk; context:{ item: contribucion }"></ng-container>
+     </div>
+ <br><br>
+   </li>
+   <h2>Comentaris d'aquest usuari:</h2>
+     <li *ngFor="let singleComment of item.comentaris">
+       <ng-container *ngTemplateOutlet="DisplayCommentMyThreads; context:{ item: singleComment }"></ng-container>
+     </li>
+     <div *ngIf="item.user_info.id == 1">
+         <h2>liked contribucions:</h2>
+         <li *ngFor="let contribucion of item.contributions">
+           <div *ngIf="isURL(contribucion.url)">
+             <ng-container *ngTemplateOutlet="DisplayContribucionURL; context:{ item: contribucion }"></ng-container>
+           </div>
+           <div *ngIf="!isURL(contribucion.url)">
+             <ng-container *ngTemplateOutlet="DisplayContribucionAsk; context:{ item: contribucion }"></ng-container>
+           </div>
+        </li>
+
+           <h2>liked comments:</h2>
+             <li *ngFor="let singleComment of item.liked_comentaris">
+               <ng-container *ngTemplateOutlet="DisplayCommentMyThreads; context:{ item: singleComment }"></ng-container>
+             </li>
+         </div>
+</ng-template>

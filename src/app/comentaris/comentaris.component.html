@@ -1,0 +1,40 @@
+
+<h2>Formulari per a fer un get d'un comentari</h2>
+<div class="form-group">
+  <label for="name">Comment identifier</label>
+  <input type="number" class="form-control" id="idGetComment"
+         required
+         [(ngModel)]="idGetComment" name="idGetComment">
+</div>
+
+<button type="button" class="btn btn-default" (click)="getComment(this.idGetComment)">Give me the comment</button>
+
+
+
+
+
+
+
+
+
+
+
+<h2>Formulari per a fer un post d'un comentari</h2>
+<div class="form-group">
+  <div>
+  <label for="name">Parent comment identifier</label>
+  <input type="number" class="form-control" id="idPostComment" required [(ngModel)]="idPostComment" name="idPotComment">
+</div>
+<div>
+  <label for="name">Contribution identifier</label>
+  <input type="number" class="form-control" id="idContribution" required [(ngModel)]="idContribution" name="idContribution">
+</div>
+<div>
+  <label for="name">Comment content</label>
+  <input type="text" class="form-control" id="idContribution" required [(ngModel)]="postContent" name="postContent">
+  <div>
+</div>
+
+<button type="button" class="btn btn-default" (click)="postComment(idPostComment, idContribution, postContent)">Post this comment</button>
+
+<app-comentari-display [comm]="getResponse" [req]="lastRequestSent"></app-comentari-display>
