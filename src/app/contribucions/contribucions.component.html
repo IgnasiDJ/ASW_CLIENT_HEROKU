@@ -16,7 +16,7 @@
 <h2>{{this.TITLEPAGE}}</h2>
 <ul >
   <span *ngIf="origin=='mythreads'">Les meves contribucions</span>
-  <li *ngFor="let contribucion of LISTACONTRIBUCIONS">
+  <li *ngFor="let contribucion of LISTACONTRIBUCIONS.slice().reverse()">
     <div *ngIf="isURL(contribucion.url)">
       <ng-container *ngTemplateOutlet="DisplayContribucionURL; context:{ item: contribucion }"></ng-container>
     </div>
